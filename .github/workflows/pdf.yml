@@ -48,10 +48,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create output directory
+        run: mkdir -p out
+
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./out
+        run: |
+          for artifact in $(echo "${{ fromJson(needs.build_latex.outputs.artifacts) }}"); do
+            echo "Downloading $artifact"
+            gh run download-artifact --name $artifact --dir out
+          done
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
