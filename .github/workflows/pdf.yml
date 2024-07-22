@@ -11,6 +11,15 @@ permissions:
 jobs:
   build_latex:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        latex_file:
+          - aud
+          - thinf
+          - db
+          - sosy
+          - ddi
+
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v4
@@ -20,23 +29,13 @@ jobs:
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: |
-            aud.tex
-            thinf.tex
-            db.tex
-            sosy.tex
-            ddi.tex
+          root_file: ${{ matrix.latex_file }}.tex
 
       - name: Upload PDF file
         uses: actions/upload-artifact@v4
         with:
-          name: main-pdf
-          path: |
-            aud.pdf
-            thinf.pdf
-            db.pdf
-            sosy.pdf
-            ddi.pdf
+          name: ${{ matrix.latex_file }}-pdf
+          path: ${{ matrix.latex_file }}.pdf
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,10 +44,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download artifact
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: main-pdf
           path: ./out
 
       - name: Deploy to GitHub Pages
