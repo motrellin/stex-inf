@@ -52,11 +52,9 @@ jobs:
         run: mkdir -p out
 
       - name: Download all artifacts
-        run: |
-          for artifact in $(echo "${{ fromJson(needs.build_latex.outputs.artifacts) }}"); do
-            echo "Downloading $artifact"
-            gh run download-artifact --name $artifact --dir out
-          done
+        uses: actions/download-artifact@v4
+        with:
+          path: out
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
